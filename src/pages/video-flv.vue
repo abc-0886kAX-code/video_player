@@ -1,15 +1,16 @@
 <!--
- * @FilePath: \flv_player\src\pages\video-flv.vue
+ * @FilePath: \video_player\src\pages\video-flv.vue
  * @Author: zhangxin
  * @Date: 2023-02-02 16:11:21
  * @LastEditors: zhangxin
- * @LastEditTime: 2023-06-14 14:10:33
+ * @LastEditTime: 2023-06-14 18:13:08
  * @Description:
 -->
 <script setup>
 import { useElementRefs } from "@/hooks/useElement";
 import { useRoute } from "@/router/useRouter";
 import { mergeObject } from "~/shared/merge";
+import flvjs from 'flv.js';
 
 const { refs, ready } = useElementRefs();
 const route = useRoute();
@@ -28,7 +29,7 @@ const videoStyle = computed(() => {
 });
 async function defineVideo() {
     loading.value = true;
-    flvPlayer.value = window.flvjs.createPlayer({
+    flvPlayer.value = flvjs.createPlayer({
         type: "flv",
         isLive: true,
         hasAudio: false,
@@ -37,7 +38,7 @@ async function defineVideo() {
     flvPlayer.value.attachMediaElement(unref(refs));
     flvPlayer.value.load();
     flvPlayer.value.play();
-    flvPlayer.value.on(window.flvjs.Events.ERROR, (error) => {
+    flvPlayer.value.on(flvjs.Events.ERROR, (error) => {
         console.log(error);
         loading.value = false;
     });
@@ -45,7 +46,7 @@ async function defineVideo() {
 }
 
 watch(ready, (state) => {
-    if (state && window.flvjs.isSupported() && isNil(unref(flvPlayer)))
+    if (state && flvjs.isSupported() && isNil(unref(flvPlayer)))
         defineVideo();
 });
 onMounted(() => {

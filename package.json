@@ -1,5 +1,5 @@
 {
-    "name": "vue2.7_template",
+    "name": "video-flv",
     "private": true,
     "version": "1.0.0",
     "type": "module",
@@ -11,16 +11,17 @@
     "dependencies": {
         "@vueuse/core": "^9.9.0",
         "@vueuse/integrations": "^9.9.0",
-        "video.js": "^7.20.3",
         "axios": "^1.1.3",
         "dayjs": "^1.11.7",
         "element-ui": "2.15.10",
+        "flv.js": "^1.6.2",
         "lodash-es": "^4.17.21",
         "normalize.css": "^8.0.1",
         "nprogress": "^0.2.0",
         "pinia": "^2.0.28",
         "pinia-plugin-persistedstate": "^2.4.0",
         "uuid": "^9.0.0",
+        "video.js": "^7.20.3",
         "vue": "2.7.8",
         "vue-router": "3.6.5",
         "vue2-scrollbar": "^0.0.3"

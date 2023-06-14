@@ -1,9 +1,9 @@
 /*
- * @FilePath: \flv_player\src\permission.js
+ * @FilePath: \video_player\src\permission.js
  * @Author: zhangxin
  * @Date: 2022-11-11 12:26:15
  * @LastEditors: zhangxin
- * @LastEditTime: 2023-06-14 13:52:40
+ * @LastEditTime: 2023-06-14 15:54:34
  * @Description:
  */
 import { useRouter } from "@/router/useRouter";
@@ -29,7 +29,7 @@ router.beforeEach((to, from, next) => {
     NProgress.start();
 
     // set page title
-    document.title = to.meta.title ?? "vue2.7_template";
+    document.title = to.meta.title ?? "video-flv";
 
     if (
         noNeedToken.findIndex((item) => {
