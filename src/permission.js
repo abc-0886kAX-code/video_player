@@ -3,7 +3,7 @@
  * @Author: zhangxin
  * @Date: 2022-11-11 12:26:15
  * @LastEditors: zhangxin
- * @LastEditTime: 2023-06-14 15:54:34
+ * @LastEditTime: 2024-07-23 16:23:03
  * @Description:
  */
 import { useRouter } from "@/router/useRouter";
@@ -18,7 +18,7 @@ const pinia = extendPinia(Vue);
 NProgress.configure({ showSpinner: false }); // NProgress Configuration
 
 const whiteList = ["/login"]; // no redirect whitelist
-const noNeedToken = ["/debug", "/singleLogin", "/404", "/video-flv", "/video-m3u8"]; // 不需要校验token的路由
+const noNeedToken = ["/debug", "/singleLogin", "/404", "/video-flv", "/video-m3u8", "/swzz-pc-player", "/swzz-wx-player"]; // 不需要校验token的路由
 
 const router = useRouter();
 

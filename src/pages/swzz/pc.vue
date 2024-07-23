@@ -1,9 +1,9 @@
 <!--
- * @FilePath: \video_player\src\pages\video-flv.vue
+ * @FilePath: \video_player\src\pages\swzz-flv.vue
  * @Author: zhangxin
  * @Date: 2023-02-02 16:11:21
  * @LastEditors: zhangxin
- * @LastEditTime: 2024-07-23 16:02:38
+ * @LastEditTime: 2024-07-23 11:10:11
  * @Description:
 -->
 <script setup>
@@ -33,7 +33,7 @@ async function defineVideo() {
         type: "flv",
         isLive: true,
         hasAudio: false,
-        url: unref(params).url,
+        url: decodeURIComponent(unref(params).url),
     });
     flvPlayer.value.attachMediaElement(unref(refs));
     flvPlayer.value.load();

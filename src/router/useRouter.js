@@ -1,9 +1,9 @@
 /*
- * @FilePath: \flv_player\src\router\useRouter.js
+ * @FilePath: \video_player\src\router\useRouter.js
  * @Author: zhangxin
  * @Date: 2022-11-30 10:18:11
  * @LastEditors: zhangxin
- * @LastEditTime: 2023-06-14 13:51:54
+ * @LastEditTime: 2024-07-23 16:21:06
  * @Description:
  */
 
@@ -11,6 +11,18 @@ import { defineRouter } from "./defineRouter";
 import { defineMeta } from "@/router/meta";
 
 const routes = [
+    {
+        name: "swzz-pc-player",
+        path: "/swzz-pc-player",
+        meta: defineMeta(),
+        component: () => import("@/pages/swzz/pc.vue"),
+    },
+    {
+        name: "swzz-wx-player",
+        path: "/swzz-wx-player",
+        meta: defineMeta(),
+        component: () => import("@/pages/swzz/wx.vue"),
+    },
     {
         name: "video-flv",
         path: "/video-flv",
