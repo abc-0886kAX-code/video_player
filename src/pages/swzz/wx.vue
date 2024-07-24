@@ -3,7 +3,7 @@
  * @Author: zhangxin
  * @Date: 2023-02-02 16:11:21
  * @LastEditors: zhangxin
- * @LastEditTime: 2024-07-23 17:42:15
+ * @LastEditTime: 2024-07-24 10:17:06
  * @Description:
 -->
 <script setup>
@@ -76,14 +76,21 @@ onUnmounted(() => {
             </div>
             <div class="video-url-holder-console">
                 <div class="video-url-holder-console-ring">
-                    <div class="triangle up" onclick="handleClick('up')"></div>
-                    <div class="triangle down" onclick="handleClick('down')"></div>
-                    <div class="triangle left" onclick="handleClick('left')"></div>
-                    <div class="triangle right" onclick="handleClick('right')"></div>
+                    <div class="triangle up"></div>
+                    <div class="triangle down"></div>
+                    <div class="triangle left"></div>
+                    <div class="triangle right"></div>
                 </div>
 
             </div>
-            <div class="video-url-holder-button"></div>
+            <div class="video-url-holder-button">
+                <div class="video-url-holder-button-item">
+                    <div class="icon plus"></div>镜头拉远
+                </div>
+                <div class="video-url-holder-button-item">
+                    <div class="icon minus"></div>镜头拉近
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -208,7 +215,57 @@ onUnmounted(() => {
         &-button {
             width: 100%;
             height: 20%;
-            background-color: palegreen
+            display: flex;
+            justify-content: space-between;
+            padding: 0 8%;
+            box-sizing: border-box;
+            text-align: center;
+
+            &-item {
+                line-height: 3rem;
+                width: 40%;
+                height: 40%;
+                background-color: #FFF;
+                border-radius: 100px;
+                box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                position: relative;
+            }
+
+            .icon {
+                display: inline-block;
+                width: 1rem;
+                height: 1rem;
+                position: relative;
+            }
+
+            .plus::before,
+            .plus::after,
+            .minus::before {
+                content: '';
+                position: absolute;
+                background-color: #000;
+            }
+
+            .plus::before,
+            .minus::before {
+                width: 100%;
+                height: 2px;
+                top: 50%;
+                left: 0;
+                transform: translateY(-50%);
+            }
+
+            .plus::after {
+                width: 2px;
+                height: 100%;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+            }
         }
     }
 }
