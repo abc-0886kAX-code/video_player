@@ -10,16 +10,21 @@
 import { useElementRefs } from "@/hooks/useElement";
 import { useRoute } from "@/router/useRouter";
 import { mergeObject } from "~/shared/merge";
-import flvjs from 'flv.js';
-
+import flvjs from "flv.js";
+import { useDebounceFn, useThrottleFn } from "@vueuse/core";
+// useDebounceFn 防抖函数
+// useThrottleFn 节流函数
 const { refs, ready } = useElementRefs();
 const route = useRoute();
 const params = computed(() => {
-    return mergeObject({
-        url: '',
-        fit: 'contain'
-    }, route.query)
-})
+    return mergeObject(
+        {
+            url: "",
+            fit: "contain",
+        },
+        route.query
+    );
+});
 const flvPlayer = ref(null);
 const loading = ref(true);
 const videoStyle = computed(() => {
@@ -46,8 +51,7 @@ async function defineVideo() {
 }
 
 watch(ready, (state) => {
-    if (state && flvjs.isSupported() && isNil(unref(flvPlayer)))
-        defineVideo();
+    if (state && flvjs.isSupported() && isNil(unref(flvPlayer))) defineVideo();
 });
 onMounted(() => {
     loading.value = true;
@@ -63,12 +67,36 @@ onUnmounted(() => {
     loading.value = false;
     flvPlayer.value = null;
 });
+
+const modifyLens = useThrottleFn((str) => {
+    switch (str) {
+        case "TOP":
+            console.log("向上移动");
+            break;
+        case "LEFT":
+            console.log("向左移动");
+            break;
+        case "BOTTOM":
+            console.log("向下移动");
+            break;
+        case "RIGHT":
+            console.log("向右移动");
+            break;
+        case "pull_away":
+            console.log("拉远");
+            break;
+        case "zoom_in":
+            console.log("拉近");
+            break;
+        default:
+            break;
+    }
+}, 1000);
 </script>
 
 <template>
     <div class="video-url" v-loading="loading">
-        <video class="video-url-main" :style="videoStyle" ref="refs" muted="muted" autoplay="autoplay" loop="loop"
-            controls></video>
+        <video class="video-url-main" :style="videoStyle" ref="refs" muted="muted" autoplay="autoplay" loop="loop" controls></video>
         <div class="video-url-holder">
             <div class="video-url-holder-title">
                 <div class="video-url-holder-title-icon"></div>
@@ -76,19 +104,20 @@ onUnmounted(() => {
             </div>
             <div class="video-url-holder-console">
                 <div class="video-url-holder-console-ring">
-                    <div class="triangle up"></div>
-                    <div class="triangle down"></div>
-                    <div class="triangle left"></div>
-                    <div class="triangle right"></div>
+                    <div class="triangle up" @click="modifyLens('TOP')"></div>
+                    <div class="triangle down" @click="modifyLens('BOTTOM')"></div>
+                    <div class="triangle left" @click="modifyLens('LEFT')"></div>
+                    <div class="triangle right" @click="modifyLens('RIGHT')"></div>
                 </div>
-
             </div>
             <div class="video-url-holder-button">
-                <div class="video-url-holder-button-item">
-                    <div class="icon plus"></div>镜头拉远
+                <div class="video-url-holder-button-item" @click="modifyLens('pull_away')">
+                    <div class="icon plus"></div>
+                    镜头拉远
                 </div>
-                <div class="video-url-holder-button-item">
-                    <div class="icon minus"></div>镜头拉近
+                <div class="video-url-holder-button-item" @click="modifyLens('zoom_in')">
+                    <div class="icon minus"></div>
+                    镜头拉近
                 </div>
             </div>
         </div>
@@ -101,6 +130,7 @@ onUnmounted(() => {
     height: 100%;
     // background-color: #ddd;
     overflow: hidden;
+    user-select: none; /* 防止文本被选中 */
 
     &-main {
         width: 100%;
@@ -116,7 +146,7 @@ onUnmounted(() => {
         height: 70%;
         overflow: hidden;
         border-radius: 30px 30px 0 0;
-        background-color: #F6F6F6;
+        background-color: #f6f6f6;
         z-index: 999;
 
         &-title {
@@ -130,7 +160,7 @@ onUnmounted(() => {
             &-icon {
                 width: 1%;
                 height: 1.2rem;
-                background-color: #1384EC;
+                background-color: #1384ec;
             }
 
             &-context {
@@ -142,7 +172,7 @@ onUnmounted(() => {
         &-console {
             height: 70%;
             width: 100%;
-            border-top: 1px solid #EEEEEE;
+            border-top: 1px solid #eeeeee;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -151,11 +181,9 @@ onUnmounted(() => {
                 width: 65%;
                 height: 60%;
                 border-radius: 50%;
-                background: -webkit-radial-gradient(circle closest-side, #F6F6F6 50%, #FFFFFF 50%);
+                background: -webkit-radial-gradient(circle closest-side, #f6f6f6 50%, #ffffff 50%);
                 position: relative;
-                box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
-
-                /* 外圆阴影 */
+                box-shadow: inset 0 5px 8px 6px rgba(238, 238, 238, 0.6), 0 10px 10px 6px rgba(238, 238, 238, 0.8);
                 .triangle {
                     position: absolute;
                     width: 0;
@@ -168,45 +196,49 @@ onUnmounted(() => {
                 .triangle.up {
                     top: 10%;
                     left: 50%;
-                    margin-left: -10px;
-                    border-width: 0 10px 20px 10px;
+                    margin-left: -14px;
+                    border-width: 0 14px 20px 14px;
                     border-color: transparent transparent #262626 transparent;
+                    border-radius: 6px;
                 }
 
                 .triangle.down {
                     bottom: 10%;
                     left: 50%;
-                    margin-left: -10px;
-                    border-width: 20px 10px 0 10px;
+                    margin-left: -14px;
+                    border-width: 20px 14px 0 14px;
                     border-color: #262626 transparent transparent transparent;
+                    border-radius: 6px;
                 }
 
                 .triangle.left {
                     top: 50%;
                     left: 10%;
-                    margin-top: -10px;
-                    border-width: 10px 20px 10px 0;
+                    margin-top: -14px;
+                    border-width: 14px 20px 14px 0;
                     border-color: transparent #262626 transparent transparent;
+                    border-radius: 6px;
                 }
 
                 .triangle.right {
                     top: 50%;
                     right: 10%;
-                    margin-top: -10px;
-                    border-width: 10px 0 10px 20px;
+                    margin-top: -14px;
+                    border-width: 14px 0 14px 20px;
                     border-color: transparent transparent transparent #262626;
+                    border-radius: 6px;
                 }
             }
 
             &-ring::before {
-                content: '';
+                content: "";
                 position: absolute;
                 top: 25%;
                 left: 25%;
                 width: 50%;
                 height: 50%;
                 border-radius: 50%;
-                background: #F6F6F6;
+                background: #f6f6f6;
                 box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
                 /* 内圆阴影 */
             }
@@ -225,14 +257,15 @@ onUnmounted(() => {
                 line-height: 3rem;
                 width: 40%;
                 height: 40%;
-                background-color: #FFF;
+                background-color: #fff;
                 border-radius: 100px;
-                box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
+                box-shadow: inset 0 5px 8px 6px rgba(238, 238, 238, 0.3), 0 10px 10px 6px rgba(238, 238, 238, 0.8);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 gap: 8px;
                 position: relative;
+                cursor: pointer;
             }
 
             .icon {
@@ -245,7 +278,7 @@ onUnmounted(() => {
             .plus::before,
             .plus::after,
             .minus::before {
-                content: '';
+                content: "";
                 position: absolute;
                 background-color: #000;
             }
