@@ -53,7 +53,8 @@ const moveObj = [{
 
 
 export function useGimbal(params) {
-    let paramsData = computed(() => {
+    const paramsData = computed(() => {
+        console.log(console.log(params));
         return mergeObject(
             {
                 url: '',
