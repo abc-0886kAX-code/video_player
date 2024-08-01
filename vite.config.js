@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => {
                     rewrite: (path) => path.replace(/^\/api/, "/api"),
                 },
                 "/get": {
-                    target: "http://192.144.218.174:9911/",
+                    target: "http://110.43.70.232:80",
                     changeOrigin: true,
                     rewrite: (path) => path.replace(/^\/get/, "/get"),
                 },

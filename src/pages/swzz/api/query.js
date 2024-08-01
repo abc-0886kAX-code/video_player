@@ -10,7 +10,7 @@ function transResponse(response) {
 }
 
 export const queryServer = service.define({
-    url: "http://server-addr:8088/VIID/ptz/status/",
+    url: "http://110.43.70.232:80/VIID/ptz/status/",
     method: "GET",
 })
 

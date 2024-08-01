@@ -79,27 +79,27 @@ export function useGimbal(params) {
         }
         let Arr = moveObj.filter(item => item.name == str)
         console.log(Arr[0], "Obj.start");
-        // mobileObtain(
-        //     {
-        //         code: unref(paramsData).code,
-        //         PTZCmdID: Arr[0].start,
-        //         PTZCmdPara1: 3,
-        //         PTZCmdPara2: 3,
-        //         PTZCmdPara3: 0
-        //     },
-        //     unref(paramsData).token
-        // )
+        mobileObtain(
+            {
+                code: unref(paramsData).code,
+                PTZCmdID: Arr[0].start,
+                PTZCmdPara1: 3,
+                PTZCmdPara2: 3,
+                PTZCmdPara3: 0
+            },
+            unref(paramsData).token
+        )
         timer = setTimeout(() => {
-            // mobileObtain(
-            //     {
-            //         code: unref(paramsData).code,
-            //         PTZCmdID: Arr[0].stop,
-            //         PTZCmdPara1: 3,
-            //         PTZCmdPara2: 3,
-            //         PTZCmdPara3: 0
-            //     },
-            //     unref(paramsData).token
-            // )
+            mobileObtain(
+                {
+                    code: unref(paramsData).code,
+                    PTZCmdID: Arr[0].stop,
+                    PTZCmdPara1: 3,
+                    PTZCmdPara2: 3,
+                    PTZCmdPara3: 0
+                },
+                unref(paramsData).token
+            )
         }, 2000)
     }
 

@@ -61,7 +61,7 @@ watch(ready, (state) => {
 });
 onMounted(() => {
     loading.value = true;
-    // queryGimbal(unref(params).token, unref(params).code);
+    queryGimbal();
 });
 onUnmounted(() => {
     if (isNil(unref(flvPlayer))) return;
