@@ -12,6 +12,7 @@ import { useRoute } from "@/router/useRouter";
 import { mergeObject } from "~/shared/merge";
 import flvjs from "flv.js";
 import { useDebounceFn, useThrottleFn } from "@vueuse/core";
+import { useGimbal } from "./useGimbal.js";
 // useDebounceFn 防抖函数
 // useThrottleFn 节流函数
 
@@ -21,6 +22,8 @@ const params = computed(() => {
     return mergeObject(
         {
             url: "",
+            code: "",
+            token: "",
             fit: "contain",
         },
         route.query
@@ -39,7 +42,9 @@ async function defineVideo() {
         type: "flv",
         isLive: true,
         hasAudio: false,
-        url: decodeURIComponent(unref(params).url),
+        // http://192.144.218.174:9911/get/flv/hls/stream?url=rtsp://110.43.70.232:32554/58312
+        // /get/flv/hls/stream?url=rtsp://rtspstream:af64f4a74947564c791f1e12d58361e9@zephyr.rtsp.stream/pattern
+        url: "",
     });
     flvPlayer.value.attachMediaElement(unref(refs));
     flvPlayer.value.load();
@@ -56,6 +61,7 @@ watch(ready, (state) => {
 });
 onMounted(() => {
     loading.value = true;
+    // queryGimbal(unref(params).token, unref(params).code);
 });
 onUnmounted(() => {
     if (isNil(unref(flvPlayer))) return;
@@ -68,37 +74,18 @@ onUnmounted(() => {
     loading.value = false;
     flvPlayer.value = null;
 });
+const { queryGimbal, mobileGimbal, destroyGimbal } = useGimbal(params);
 
 const modifyLens = useThrottleFn((str) => {
-    switch (str) {
-        case "TOP":
-            console.log("向上移动");
-            break;
-        case "LEFT":
-            console.log("向左移动");
-            break;
-        case "BOTTOM":
-            console.log("向下移动");
-            break;
-        case "RIGHT":
-            console.log("向右移动");
-            break;
-        case "pull_away":
-            console.log("拉远");
-            break;
-        case "zoom_in":
-            console.log("拉近");
-            break;
-        default:
-            break;
-    }
+    mobileGimbal(str);
 }, 1000);
 </script>
 
 <template>
-    <div class="video-url" v-loading="loading">
+    <div class="video-url" v-loading="false">
         <div class="video-url-main">
             <video class="video-url-main-video" :style="videoStyle" ref="refs" muted="muted" autoplay="autoplay" loop="loop" controls></video>
+            <!-- <iframe width="100%" height="100%" src="http://192.144.218.174:9911/flv/hls/stream?url=rtsp://rtspstream:af64f4a74947564c791f1e12d58361e9@zephyr.rtsp.stream/pattern"></iframe> -->
             <div class="video-url-main-title">
                 <div class="video-url-main-title-name">张坊水文站云台控制</div>
                 <div class="video-url-main-title-time">2024-07-23 15:44:38</div>
@@ -108,25 +95,25 @@ const modifyLens = useThrottleFn((str) => {
         <div class="video-url-slot">
             <div class="video-url-slot-compass">
                 <div class="video-url-slot-compass-main"></div>
-                <div class="video-url-slot-compass-top move_box" @click="modifyLens('TOP')">
+                <div class="video-url-slot-compass-top move_box" @click="modifyLens('top')">
                     <div></div>
                 </div>
-                <div class="video-url-slot-compass-left move_box" @click="modifyLens('LEFT')">
+                <div class="video-url-slot-compass-left move_box" @click="modifyLens('left')">
                     <div></div>
                 </div>
-                <div class="video-url-slot-compass-bottom move_box" @click="modifyLens('BOTTOM')">
+                <div class="video-url-slot-compass-bottom move_box" @click="modifyLens('bottom')">
                     <div></div>
                 </div>
-                <div class="video-url-slot-compass-right move_box" @click="modifyLens('RIGHT')">
+                <div class="video-url-slot-compass-right move_box" @click="modifyLens('right')">
                     <div></div>
                 </div>
             </div>
             <div class="video-url-slot-lens">
-                <div class="video-url-slot-lens-far" @click="modifyLens('pull_away')">
+                <div class="video-url-slot-lens-far" @click="modifyLens('far')">
                     <div>+</div>
                     <span>镜头拉远</span>
                 </div>
-                <div class="video-url-slot-lens-near" @click="modifyLens('zoom_in')">
+                <div class="video-url-slot-lens-near" @click="modifyLens('near')">
                     <div class="video-url-slot-lens-minus"></div>
                     <span>镜头拉近</span>
                 </div>
