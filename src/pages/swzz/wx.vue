@@ -12,6 +12,7 @@ import { useRoute } from "@/router/useRouter";
 import { mergeObject } from "~/shared/merge";
 import flvjs from "flv.js";
 import { useDebounceFn, useThrottleFn } from "@vueuse/core";
+import { useGimbal } from "./useGimbal.js";
 // useDebounceFn 防抖函数
 // useThrottleFn 节流函数
 const { refs, ready } = useElementRefs();
@@ -20,11 +21,15 @@ const params = computed(() => {
     return mergeObject(
         {
             url: "",
+            code: "",
+            token: "",
             fit: "contain",
         },
         route.query
     );
 });
+// 解构出自定义云台控制函数
+const { queryGimbal, mobileGimbal, destroyGimbal } = useGimbal(params);
 const flvPlayer = ref(null);
 const loading = ref(true);
 const videoStyle = computed(() => {
@@ -55,6 +60,7 @@ watch(ready, (state) => {
 });
 onMounted(() => {
     loading.value = true;
+    queryGimbal();
 });
 onUnmounted(() => {
     if (isNil(unref(flvPlayer))) return;
@@ -67,30 +73,9 @@ onUnmounted(() => {
     loading.value = false;
     flvPlayer.value = null;
 });
-
+// 设置点击云台控制按钮绑定上防抖函数
 const modifyLens = useThrottleFn((str) => {
-    switch (str) {
-        case "TOP":
-            console.log("向上移动");
-            break;
-        case "LEFT":
-            console.log("向左移动");
-            break;
-        case "BOTTOM":
-            console.log("向下移动");
-            break;
-        case "RIGHT":
-            console.log("向右移动");
-            break;
-        case "pull_away":
-            console.log("拉远");
-            break;
-        case "zoom_in":
-            console.log("拉近");
-            break;
-        default:
-            break;
-    }
+    mobileGimbal(str);
 }, 1000);
 </script>
 
@@ -104,18 +89,18 @@ const modifyLens = useThrottleFn((str) => {
             </div>
             <div class="video-url-holder-console">
                 <div class="video-url-holder-console-ring">
-                    <div class="triangle up" @click="modifyLens('TOP')"></div>
-                    <div class="triangle down" @click="modifyLens('BOTTOM')"></div>
-                    <div class="triangle left" @click="modifyLens('LEFT')"></div>
-                    <div class="triangle right" @click="modifyLens('RIGHT')"></div>
+                    <div class="triangle up" @click="modifyLens('top')"></div>
+                    <div class="triangle down" @click="modifyLens('bottom')"></div>
+                    <div class="triangle left" @click="modifyLens('left')"></div>
+                    <div class="triangle right" @click="modifyLens('right')"></div>
                 </div>
             </div>
             <div class="video-url-holder-button">
-                <div class="video-url-holder-button-item" @click="modifyLens('pull_away')">
+                <div class="video-url-holder-button-item" @click="modifyLens('far')">
                     <div class="icon plus"></div>
                     镜头拉远
                 </div>
-                <div class="video-url-holder-button-item" @click="modifyLens('zoom_in')">
+                <div class="video-url-holder-button-item" @click="modifyLens('near')">
                     <div class="icon minus"></div>
                     镜头拉近
                 </div>

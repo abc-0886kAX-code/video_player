@@ -15,7 +15,6 @@ import { useDebounceFn, useThrottleFn } from "@vueuse/core";
 import { useGimbal } from "./useGimbal.js";
 // useDebounceFn 防抖函数
 // useThrottleFn 节流函数
-
 const { refs, ready } = useElementRefs();
 const route = useRoute();
 const params = computed(() => {
@@ -29,13 +28,20 @@ const params = computed(() => {
         route.query
     );
 });
+// 解构出自定义云台控制函数
+const { queryGimbal, mobileGimbal, destroyGimbal } = useGimbal(params);
+// 定义播放的
 const flvPlayer = ref(null);
+// 是否开启加载中
 const loading = ref(true);
+// 设置直播样式
 const videoStyle = computed(() => {
     return {
         "object-fit": unref(params).fit,
     };
 });
+
+// 开启直播监控
 async function defineVideo() {
     loading.value = true;
     flvPlayer.value = flvjs.createPlayer({
@@ -44,13 +50,12 @@ async function defineVideo() {
         hasAudio: false,
         // http://192.144.218.174:9911/get/flv/hls/stream?url=rtsp://110.43.70.232:32554/58312
         // /get/flv/hls/stream?url=rtsp://rtspstream:af64f4a74947564c791f1e12d58361e9@zephyr.rtsp.stream/pattern
-        url: "",
+        url: decodeURIComponent(unref(params).url),
     });
     flvPlayer.value.attachMediaElement(unref(refs));
     flvPlayer.value.load();
     flvPlayer.value.play();
     flvPlayer.value.on(flvjs.Events.ERROR, (error) => {
-        console.log(error);
         loading.value = false;
     });
     loading.value = false;
@@ -65,27 +70,24 @@ onMounted(() => {
 });
 onUnmounted(() => {
     if (isNil(unref(flvPlayer))) return;
-
     unref(flvPlayer).pause();
     unref(flvPlayer).unload();
     // unref(flvPlayer).detachMediaElement();
     unref(flvPlayer).destroy();
-
     loading.value = false;
     flvPlayer.value = null;
 });
-const { queryGimbal, mobileGimbal, destroyGimbal } = useGimbal(params);
 
+// 设置点击云台控制按钮绑定上防抖函数
 const modifyLens = useThrottleFn((str) => {
     mobileGimbal(str);
 }, 1000);
 </script>
 
 <template>
-    <div class="video-url" v-loading="false">
+    <div class="video-url" v-loading="loading">
         <div class="video-url-main">
             <video class="video-url-main-video" :style="videoStyle" ref="refs" muted="muted" autoplay="autoplay" loop="loop" controls></video>
-            <!-- <iframe width="100%" height="100%" src="http://192.144.218.174:9911/flv/hls/stream?url=rtsp://rtspstream:af64f4a74947564c791f1e12d58361e9@zephyr.rtsp.stream/pattern"></iframe> -->
             <div class="video-url-main-title">
                 <div class="video-url-main-title-name">张坊水文站云台控制</div>
                 <div class="video-url-main-title-time">2024-07-23 15:44:38</div>

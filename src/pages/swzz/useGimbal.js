@@ -5,6 +5,8 @@ import { mergeObject } from "~/shared/merge";
 import { queryServer, queryObtain } from './api/query'
 import { mobileServer, mobileObtain } from './api/mobile'
 import { destroyServer, destroyObtain } from './api/destroy'
+import { startServer, startObtain } from './api/start'
+import { Message } from 'element-ui';
 const route = useRoute();
 
 /**
@@ -53,8 +55,8 @@ const moveObj = [{
 
 
 export function useGimbal(params) {
+    // 定义传递过来的参数
     const paramsData = computed(() => {
-        console.log(console.log(params));
         return mergeObject(
             {
                 url: '',
@@ -67,52 +69,105 @@ export function useGimbal(params) {
     let timer = null;
     // 查询云台
     const queryGimbal = () => {
-
         queryObtain({ code: unref(paramsData).code }, unref(paramsData).token).then((res) => {
-            console.log(res, "获取云台信息");
-        })
+            // 数据请求成功
+            if (res.ErrCode == 0) {
+                // Status==0 空闲  
+                // Status==1 连接状态   QueryUserCtrl==0 不是当前查询用户在控制   QueryUserCtrl==1  是当前查询用户在控制
+                // Status==2 链接锁定状态  
+                if (res.Result.Status == 1) {
+                    if (res.Result.QueryUserCtrl == 0) {
+                        Message({
+                            showClose: true,
+                            message: '其他人在控制云台，您当前不能进行云台控制',
+                            type: 'warning'
+                        });
+                    }
+                } else if (res.Result.Status == 2) {
+                    Message({
+                        showClose: true,
+                        message: '链接锁定状态，您当前不能进行云台控制',
+                        type: 'warning'
+                    });
+                } else {
+                    startGimbal()
+                }
+            } else {
+                Message({
+                    showClose: true,
+                    message: '查询云台状态失败',
+                    type: 'error'
+                });
+            }
 
+        })
     }
-    // 移动云台
+    // 开启云台
+    const startGimbal = () => {
+        startObtain({ code: unref(paramsData).code }, unref(paramsData).token).then((res) => {
+            if (res.ErrCode != 0) {
+                Message({
+                    showClose: true,
+                    message: '启动云台控制失败',
+                    type: 'error'
+                });
+            }
+        })
+    }
+    // 移动云台函数
     const mobileGimbal = (str) => {
         if (timer) {
             clearTimeout(timer);
         }
+        // 获取到移动方向
         let Arr = moveObj.filter(item => item.name == str)
-        console.log(Arr[0], "Obj.start");
+        // 开始云台移动
         mobileObtain(
+            unref(paramsData).code,
             {
-                code: unref(paramsData).code,
-                PTZCmdID: Arr[0].start,
+                PTZCmdID: Arr[0].start - 0,
                 PTZCmdPara1: 3,
                 PTZCmdPara2: 3,
                 PTZCmdPara3: 0
             },
             unref(paramsData).token
-        )
+        ).then((res) => {
+        })
         timer = setTimeout(() => {
+            // 结束云台移动
             mobileObtain(
+                unref(paramsData).code,
                 {
-                    code: unref(paramsData).code,
-                    PTZCmdID: Arr[0].stop,
+                    PTZCmdID: Arr[0].stop - 0,
                     PTZCmdPara1: 3,
                     PTZCmdPara2: 3,
                     PTZCmdPara3: 0
                 },
                 unref(paramsData).token
-            )
+            ).then((res) => {
+            })
         }, 2000)
     }
 
-    // 销毁云台
+    // 停止云台控制函数
     const destroyGimbal = () => {
-        destroy({ code: unref(paramsData).code }, unref(paramsData).token)
+        destroyObtain({ code: unref(paramsData).code }, unref(paramsData).token).then((res) => {
+            if (res.ErrCode != 0) {
+                Message({
+                    showClose: true,
+                    message: '停止云台控制失败',
+                    type: 'error'
+                });
+            }
+        })
     }
 
     onMounted(() => {
     });
-    onUnmounted(() => {
-        console.log("页面销毁");
+
+    (() => {
+        // 离开当前页面进行停止控制云台控制
+        destroyGimbal();
     })
-    return { queryGimbal, mobileGimbal, destroyGimbal };
+    return { queryGimbal, mobileGimbal, destroyGimbal, startGimbal };
 }

@@ -18,6 +18,7 @@ export function detailObtain(props, viidToken) {
     detailServer.server.config.bind("headers", {
         Authorization: viidToken
     })
+
     detailServer.server.config.bind("data", transFormData(props) || {})
 
     return detailServer.obtain({ transResponse });

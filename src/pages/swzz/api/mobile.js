@@ -10,15 +10,21 @@ function transResponse(response) {
 }
 
 export const mobileServer = service.define({
-    url: "http://server-addr:8088/VIID/ptz/ctrl/",
+    url: "http://110.43.70.232:80/VIID/ptz/ctrl/",
     method: "POST",
 })
 
-export function mobileObtain(props, viidToken) {
+export function mobileObtain(code, props, viidToken) {
     mobileServer.server.config.bind("headers", {
-        Authorization: viidToken
+        Authorization: viidToken,
+        'Content-Type': 'application/json'
     })
-    mobileServer.server.config.bind("data", transFormData(props) || {})
+    console.log('====================================');
+    console.log(JSON.stringify(props), "JSON.stringify(props)");
+    console.log('====================================');
+    // mobileServer.server.config.bind("contentType", 'application/json')
+    mobileServer.server.config.bind("url", `http://110.43.70.232:80/VIID/ptz/ctrl/${code}`)
+    mobileServer.server.config.bind("data", props)
 
     return mobileServer.obtain({ transResponse });
 }
